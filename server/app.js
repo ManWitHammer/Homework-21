@@ -1,12 +1,13 @@
-const express = require('express') // подключение express
-const path = require('path') // подключение path
+const express = require('express') 
+const path = require('path')
+const fs = require('fs')
 
-const server = express() // вызов express 
+const server = express()
 
-const PORT = 3000
+const PORT = 3002
 
-// функция, определения пути до файла
 const createPath = (page) => path.resolve(__dirname, 'pages', `${page}.html`)
+const createJson = (page) => path.resolve(__dirname, 'pages', `${page}.json`) 
 
 server.use(express.static(__dirname + '/pages')) // подключение статических файлов
 
@@ -24,6 +25,15 @@ server.get('/main', (req, res) => {
 })
 server.get('/home', (req, res) => {
     res.redirect('/')
+})
+server.get('/comments1', (req, res) => {
+    res.sendFile(createJson('data/data1'))
+})
+server.use(express.json()); 
+server.post('/comments1', (req, res) => {
+    const data = JSON.parse(fs.readFileSync('pages/data/data1.json'))
+    data.unshift(req.body)
+    fs.writeFileSync('pages/data/data1.json', JSON.stringify(data))
 })
 server.get('/page1', (req, res) => {
     res.sendFile(createPath('page1'))
